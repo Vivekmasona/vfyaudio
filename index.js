@@ -1,32 +1,36 @@
 const express = require('express');
+const fetch = require('node-fetch');
 const app = express();
 
 // Endpoint to handle GET requests
-app.get('/play', (req, res) => {
-    const { url } = req.query;
+app.get('/redirect', async (req, res) => {
+    try {
+        const youtubeUrl = req.query.url;
+        const apiUrl = `https://vivekplay.vercel.app/api/info?url=${encodeURIComponent(youtubeUrl)}`;
 
-    // Construct the API endpoint URL
-    const apiUrl = `https://vivekplay.vercel.app/api/info?url=${url}`;
+        // Make a fetch request to get JSON data from vivekplay API
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data: ${response.status} ${response.statusText}`);
+        }
 
-    // Make a fetch request to the API
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            // Find the format with format_id '140'
-            const audioFormat = data.formats.find(format => format.format_id === '140');
-            if (audioFormat) {
-                const playbackUrl = audioFormat.url;
-                // Redirect to the 140 format URL
-                res.redirect(playbackUrl);
-            } else {
-                console.error("Format 140 not found in the response.");
-                res.status(404).send('Format 140 not available.');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching data:', error);
-            res.status(500).send('Error fetching data.');
-        });
+        const data = await response.json();
+
+        // Find the format with format_id '140'
+        const audioFormat = data.find(format => format.format_id === '140');
+        if (!audioFormat) {
+            throw new Error('Format 140 not found in the response.');
+        }
+
+        const playbackUrl = audioFormat.url;
+        console.log("Playback URL:", playbackUrl);
+
+        // Redirect to the 140 format URL
+        res.redirect(playbackUrl);
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).send('Error fetching or redirecting.');
+    }
 });
 
 // Start the server
