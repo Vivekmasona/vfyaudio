@@ -1,0 +1,15 @@
+{
+  "name": "youtube-audio-player",
+  "version": "1.0.0",
+  "description": "A Node.js server to fetch and redirect YouTube audio playback URLs.",
+  "main": "index.js", // Replace with your main entry point file
+  "scripts": {
+    "start": "node index.js" // Replace 'index.js' with your main entry point file
+  },
+  "dependencies": {
+    "express": "^4.17.2",
+    "node-fetch": "^3.0.0" // Add 'node-fetch' for making fetch requests in Node.js
+  },
+  "author": "vivek masona",
+  "license": "MIT"
+}
